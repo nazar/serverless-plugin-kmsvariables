@@ -1,0 +1,10 @@
+Credits
+This application uses Open Source code from the Serverless Framework Project.
+You can find the source code of their open source projects along with license information below.
+We acknowledge and are grateful to these developers for their contributions to open source.
+
+
+License: https://github.com/serverless/serverless/blob/master/LICENSE.txt
+Git: https://github.com/serverless/serverless
+Docs: http://docs.serverless.com/v0.5.0/docs
+
