@@ -1,0 +1,31 @@
+{
+  "name": "serverless-plugin-kmsvariables",
+  "version": "1.0.0",
+  "description": "Serverless Plugin to use KMS for variables",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": { "name" : "Mike Fuller"},
+  "contributors": [{ "name" : "Alec Posney"}],
+  "license": "Apache-2.0",
+  "keywords": [
+    "serverless plugin kmsvariables",
+    "serverless framework plugin",
+    "serverless applications",
+    "serverless plugins",
+    "api gateway",
+    "lambda",
+    "kms",
+    "aws",
+    "aws lambda",
+    "amazon",
+    "amazon web services"
+  ],
+  "files": "index.js",
+  "dependencies": {
+    "bluebird": "^3.0.6",
+    "chalk": "^1.1.3",
+    "lodash": "^3.5.0"
+  }
+}
