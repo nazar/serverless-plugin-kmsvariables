@@ -9,11 +9,11 @@ This Plugin adds KMS Support to the Variables of Serverless.
 ### Installation
 
  - make sure that aws and serverless are installed
- - @see http://docs.aws.amazon.com/cli/latest/userguide/installing.html
- - @see http://www.serverless.com/
+ - see http://docs.aws.amazon.com/cli/latest/userguide/installing.html
+ - see http://www.serverless.com/
  - 
  - Create a KMS key in your AWS Account
- - @see http://docs.aws.amazon.com/kms/latest/developerguide/create-keys.html
+ - see http://docs.aws.amazon.com/kms/latest/developerguide/create-keys.html
  - 
  - install this plugin to your project
  - (adds the plugin to your node_modules folder)
