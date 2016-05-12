@@ -1,6 +1,6 @@
 {
   "name": "serverless-plugin-kmsvariables",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Serverless Plugin to use KMS for variables",
   "main": "index.js",
   "scripts": {
@@ -9,8 +9,14 @@
   "engines": {
     "node": ">=5.0"
   },
-  "author": { "name" : "Mike Fuller"},
-  "contributors": [{ "name" : "Alec Posney"}],
+  "author": {
+    "name": "Mike Fuller"
+  },
+  "contributors": [
+    {
+      "name": "Alec Posney"
+    }
+  ],
   "license": "Apache-2.0",
   "keywords": [
     "serverless plugin kmsvariables",
@@ -25,7 +31,11 @@
     "amazon",
     "amazon web services"
   ],
-  "files": ["index.js", "CREDITS.txt", "LICENSE.txt"],
+  "files": [
+    "index.js",
+    "CREDITS.txt",
+    "LICENSE.txt"
+  ],
   "dependencies": {
     "bluebird": "^3.0.6",
     "chalk": "^1.1.3",
@@ -35,5 +45,7 @@
     "type": "git",
     "url": "git+https://bitbucket.org/atlassian/serverless-plugin-kmsvariables.git"
   },
-  "bugs": {"url": "https://bitbucket.org/atlassian/serverless-plugin-kmsvariables/issues"}
+  "bugs": {
+    "url": "https://bitbucket.org/atlassian/serverless-plugin-kmsvariables/issues"
+  }
 }
