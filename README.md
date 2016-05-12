@@ -1,6 +1,8 @@
 Serverless Plugin KMSVariables
 ==========================
 
+[![NPM](https://nodei.co/npm/serverless-plugin-kmsvariables.png)](https://nodei.co/npm/serverless-plugin-kmsvariables/)
+
 This Plugin adds KMS Support to the Variables of Serverless.
 
 *Note*: This plugin supports Serverless 0.5.* 
