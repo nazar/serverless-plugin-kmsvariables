@@ -1,6 +1,6 @@
 {
   "name": "serverless-plugin-kmsvariables",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Serverless Plugin to use KMS for variables",
   "main": "index.js",
   "scripts": {
