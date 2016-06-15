@@ -121,12 +121,14 @@ module.exports = function(S) {
             let variables = region.getVariables();
             for (var variable in variables) {
               if (!_.startsWith(variable, '_') && _.has(variables, variable)) {
-                if(typeof variables[variable] === 'object') {  
-                  if('value' in variables[variable]) { 
+                if(typeof variables[variable] === 'object') {
+                  if('value' in variables[variable]) {
                     if('encrypted' in variables[variable] && variables[variable].encrypted === 'true') {
-                      promises.push(new BbPromise(function(resolve, reject) {
-                        _this._decrypt(variables[variable].value, true).then(function(value) {resolve([region,variable,value]);});
-                      }));
+                      promises.push(
+                        _this
+                          ._decrypt(variables[variable].value , true)
+                          .then(value => [region,variable,value])
+                      );
                     } else {
                       region.variables[variable] = variables[variable].value;
                     }
@@ -142,10 +144,14 @@ module.exports = function(S) {
             let variables = stage.getVariables();
             for (var variable in variables) {
               if (!_.startsWith(variable, '_') && _.has(variables, variable)) {
-                if(typeof variables[variable] === 'object') {  
-                  if('value' in variables[variable]) { 
+                if(typeof variables[variable] === 'object') {
+                  if('value' in variables[variable]) {
                     if('encrypted' in variables[variable] && variables[variable].encrypted === 'true') {
-                      _this._decrypt(variables[variable].value, true).then(function(value) {resolve([stage,variable,value]);});
+                      promises.push(
+                        _this
+                          ._decrypt(variables[variable].value, true)
+                          .then(value => [stage,variable,value])
+                      );
                     } else {
                       stage.variables[variable] = variables[variable].value;
                     }
@@ -159,7 +165,7 @@ module.exports = function(S) {
           let promises = [];
           if (!evt.options.runDeployed) {
             if(evt.options.stage) {
-              let stage = S.getProject().getStage(evt.options.stage)
+              let stage = S.getProject().getStage(evt.options.stage);
               promises = promises.concat(listStageVariableHelper(stage));
               if(evt.options.region) {
                 let region = stage.getRegion(evt.options.region);
