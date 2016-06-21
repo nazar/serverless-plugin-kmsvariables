@@ -114,82 +114,81 @@ module.exports = function(S) {
      * packaged into the runtime/build
      */
     _variableReplace(evt) {
-      let _this = this;
-        return new BbPromise(function(resolve, reject) {
-          let listRegionVariableHelper = (region) => {
-            let promises = [];
-            let variables = region.getVariables();
-            for (var variable in variables) {
-              if (!_.startsWith(variable, '_') && _.has(variables, variable)) {
-                if(typeof variables[variable] === 'object') {
-                  if('value' in variables[variable]) {
-                    if('encrypted' in variables[variable] && variables[variable].encrypted === 'true') {
-                      promises.push(
-                        _this
-                          ._decrypt(variables[variable].value , true)
-                          .then(value => [region,variable,value])
-                      );
-                    } else {
-                      region.variables[variable] = variables[variable].value;
-                    }
-                  }
-                }
-              }
-            }
-            return promises;
-          };
+      const _this = this;
 
-          let listStageVariableHelper = (stage) => {
-            let promises = [];
-            let variables = stage.getVariables();
-            for (var variable in variables) {
-              if (!_.startsWith(variable, '_') && _.has(variables, variable)) {
-                if(typeof variables[variable] === 'object') {
-                  if('value' in variables[variable]) {
-                    if('encrypted' in variables[variable] && variables[variable].encrypted === 'true') {
-                      promises.push(
-                        _this
-                          ._decrypt(variables[variable].value, true)
-                          .then(value => [stage,variable,value])
-                      );
-                    } else {
-                      stage.variables[variable] = variables[variable].value;
-                    }
-                  }
-                }
-              }
-            }
-            return promises;
-          };
+      const decrypt = function(regionOrStage, variable, value) {
+        return _this
+          ._decrypt(value, true)
+          .then(decrypted => [regionOrStage, variable, decrypted]);
+      };
 
+      return new BbPromise(function(resolve, reject) {
+        let listRegionVariableHelper = (region) => {
           let promises = [];
-          if (!evt.options.runDeployed) {
-            if(evt.options.stage) {
-              let stage = S.getProject().getStage(evt.options.stage);
-              promises = promises.concat(listStageVariableHelper(stage));
-              if(evt.options.region) {
-                let region = stage.getRegion(evt.options.region);
-                promises = promises.concat(listRegionVariableHelper(region));
-              } else {
-                S.getProject().getAllRegions(stage.getName()).forEach(function (region) {
-                    promises = promises.concat(listRegionVariableHelper(region));
-                });
+          let variables = region.getVariables();
+          for (var variable in variables) {
+            if (!_.startsWith(variable, '_') && _.has(variables, variable)) {
+              if(typeof variables[variable] === 'object') {
+                if('value' in variables[variable]) {
+                  if('encrypted' in variables[variable] && variables[variable].encrypted === 'true') {
+                    promises.push(decrypt(region, variable, variables[variable].value));
+                  } else {
+                    region.variables[variable] = variables[variable].value;
+                  }
+                }
               }
-            } else {
-              S.getProject().getAllStages().forEach(stage => {
-                promises = promises.concat(listStageVariableHelper(stage));
-                S.getProject().getAllRegions(stage.getName()).forEach(function (region) {
-                  promises = promises.concat(listRegionVariableHelper(region));
-                });
-              });
             }
           }
-          BbPromise.mapSeries(promises, function(val) {
-            // StageOrRegion, key, value = val
-            val[0].variables[val[1]] = val[2];
-          }).then(function() {
-            resolve(evt);
-          });
+          return promises;
+        };
+
+        let listStageVariableHelper = (stage) => {
+          let promises = [];
+          let variables = stage.getVariables();
+          for (var variable in variables) {
+            if (!_.startsWith(variable, '_') && _.has(variables, variable)) {
+              if(typeof variables[variable] === 'object') {
+                if('value' in variables[variable]) {
+                  if('encrypted' in variables[variable] && variables[variable].encrypted === 'true') {
+                    promises.push(decrypt(stage, variable, variables[variable].value));
+                  } else {
+                    stage.variables[variable] = variables[variable].value;
+                  }
+                }
+              }
+            }
+          }
+          return promises;
+        };
+
+        let promises = [];
+        if (!evt.options.runDeployed) {
+          if(evt.options.stage) {
+            let stage = S.getProject().getStage(evt.options.stage);
+            promises = promises.concat(listStageVariableHelper(stage));
+            if(evt.options.region) {
+              let region = stage.getRegion(evt.options.region);
+              promises = promises.concat(listRegionVariableHelper(region));
+            } else {
+              S.getProject().getAllRegions(stage.getName()).forEach(function (region) {
+                  promises = promises.concat(listRegionVariableHelper(region));
+              });
+            }
+          } else {
+            S.getProject().getAllStages().forEach(stage => {
+              promises = promises.concat(listStageVariableHelper(stage));
+              S.getProject().getAllRegions(stage.getName()).forEach(function (region) {
+                promises = promises.concat(listRegionVariableHelper(region));
+              });
+            });
+          }
+        }
+        BbPromise.mapSeries(promises, function(val) {
+          // StageOrRegion, key, value = val
+          val[0].variables[val[1]] = val[2];
+        }).then(function() {
+          resolve(evt);
+        });
       });
     }
 
@@ -201,10 +200,10 @@ module.exports = function(S) {
       let _this = this;
       return new BbPromise(function(resolve) {
         let decrypt = false;
-        if(typeof value === 'object') {  
+        if(typeof value === 'object') {
           if(!_this.evt.options.decrypt){
             value = '*******';
-          } else if('value' in value) { 
+          } else if('value' in value) {
             if('encrypted' in value && value.encrypted === 'true') {
               decrypt = true;
               value = value.value;
@@ -229,7 +228,7 @@ module.exports = function(S) {
           let key_arn = _this._getKMSID();
           let key_region = key_arn.split(':')[3];
           let params = {region: key_region};
-          
+
           let kms = new AWS.KMS(params);
           params = {KeyId: key_arn, Plaintext: value};
           kms.encrypt(params, function(err, data) {
@@ -396,10 +395,10 @@ module.exports = function(S) {
       if (!S.config.interactive) {
         // Check Params
         const paramsOk = (!!_this.evt.options.type && !!_this.evt.options.key && !!_this.evt.options.value) &&
-                         (_this.evt.options.type === 'common' || 
+                         (_this.evt.options.type === 'common' ||
                            (_this.evt.options.type === 'stage' && !!_this.evt.options.stage) ||
                            (_this.evt.options.type === 'region' && !!_this.evt.options.stage && !!_this.evt.options.region));
-        
+
         if (!paramsOk) {
           return BbPromise.reject(new SError('Wrong parameter combination or missing key/value. See --help.'));
         }
@@ -430,7 +429,7 @@ module.exports = function(S) {
             region = this.evt.options.region,
             project = S.getProject();
       return new BbPromise(function(resolve) {
-        
+
         let setVariableHelper = (region) => {
 
           let v = {};
@@ -440,7 +439,7 @@ module.exports = function(S) {
           region.save();
         };
 
-        
+
         _this._encrypt(_this.evt.options.value, _this.evt.options.encrypt).then(function(value) {
           let v = {};
           v[_this.evt.options.key] = value;
@@ -557,7 +556,7 @@ module.exports = function(S) {
 
       let stages = [];
       if(stage && stage != 'all') {
-        stages = [S.getProject().getStage(stage)];   
+        stages = [S.getProject().getStage(stage)];
       } else {
         stages = S.getProject().getAllStages();
       }
@@ -570,11 +569,11 @@ module.exports = function(S) {
       if(stages.length > 0) {
         let data = [chalk.underline('common:')];
         data = data.concat(listVariableHelper(S.getProject().getVariables(),''));
-        
+
 
         stages.forEach(stage => {
           let stageName = stage.getName();
-          
+
           let stageRegions = S.getProject().getAllRegions(stageName);
           if (region && region != 'all') {
             stageRegions = stageRegions.filter(function(stageRegion) { return region == stageRegion.getName();})
